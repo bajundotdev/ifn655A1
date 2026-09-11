@@ -1,0 +1,14 @@
+Column,Issue
+"ACCIDENT_TYPE, DCA_CODE, ROAD_GEOMETRY, LIGHT_CONDITION, POLICE_ATTEND, SEVERITY",Nominal/ordinal categorical codes incorrectly inferred as int64
+ACCIDENT_DATE / ACCIDENT_TIME,Temporal data loaded as strings instead of datetime objects
+SPEED_ZONE,"14,901 rows use codes 777/888/999 in a numeric column"
+NODE_ID,Contains zero or negative values
+RMA,"7,673 missing values"
+SEVERITY,"Severe target class imbalance: Fatal crashes (1) represent only 1.67% of data, class 4 (none) is entirely missing"
+NO_PERSONS,Extreme right-skew distribution containing severe mass-casualty outliers (up to ~100 persons) that will warp distance-based algorithms
+DAY_OF_WEEK,"4,584 rows fail to match ISO numbering."
+NO_OF_VEHICLES,6 crashes recorded with zero vehicles.
+SEVERITY / NO_PERSONS_INJ_2,Severity scale coding contradicts actual injury counts in 1 records
+ACCIDENT_NO,9 accidents have no matching vehicle record
+ACCIDENT_TYPE / DCA_CODE,Strong positive multicollinearity indicating redundant feature information
+SEVERITY / NO_PERSONS_INJ_2,Strong negative correlation due to inverted severity scale coding
