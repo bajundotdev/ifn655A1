@@ -44,8 +44,8 @@ print(f'Mean SPEED_ZONE excluding codes: {mean_after:.1f}')
 # The first figure is not a speed limit - it is what happens when 999 is averaged in
 
 # Apply binning into a new SPEED_ZONE_DESC column
-bins = [0, 40, 60, 80, 100, 150]
-labels = ['0-40 km/h', '41-60 km/h', '61-80 km/h', '81-100 km/h', '100+ km/h']
+bins = [0, 40, 50, 60, 75, 80, 90, 100, 110]
+labels = ['40 km/hr', '50 km/hr', '60 km/hr', '75 km/hr', '80 km/hr', '90 km/hr', '100 km/hr', '110 km/hr']
 
 accident_df["SPEED_ZONE_DESC"] = pd.cut(
     pd.to_numeric(accident_df["SPEED_ZONE"]), 
@@ -268,9 +268,8 @@ print(f"\nrows before filtering: {len(accident_df):,}")
 print(f"rows set aside: {len(reject_df):,}")
 print(f"rows kept: {len(clean_df):,}")
 
-# STEP 08: This step identifies extreme outliers in the person and vehicle count fields using a z-score threshold,
-# flags them for review, and plots the impact so we can assess whether they represent legitimate events or 
-# data anomalies.
+# STEP 08: This step identifies extreme outliers in the person and vehicle count fields using a z-score threshold
+# and plots the person-count distribution for review.
 print("\nSTEP 08 Handling Outliers")
 print("=" * 95)
 # Detect unusually large crashes with z-scores and flag them without deleting them.
@@ -281,25 +280,9 @@ for column in ["NO_PERSONS", "NO_PERSONS_KILLED", "NO_OF_VEHICLES"]:
     zscore = np.abs(stats.zscore(values))
     print(f"  {column:<20} flags {(zscore > 3).sum():>8,} rows ({(zscore > 3).mean() * 100:5.2f}%)")
 
-persons = clean_df["NO_PERSONS"].dropna()
-persons_zscore = np.abs(stats.zscore(persons))
-
-clean_df["NO_PERSONS_ZSCORE"] = np.nan
-clean_df.loc[persons.index, "NO_PERSONS_ZSCORE"] = persons_zscore
-clean_df["IS_LARGE_CRASH"] = (clean_df["NO_PERSONS_ZSCORE"] > 3).astype(int)
-
-print(f'\nRows flagged as unusually large: {clean_df["IS_LARGE_CRASH"].sum():,}')
-print("\nThe largest crashes the z-score flags in NO_PERSONS:")
-print(clean_df[clean_df["IS_LARGE_CRASH"] == 1].nlargest(6, "NO_PERSONS")[
-    ["ACCIDENT_NO", "ACCIDENT_DATE", "SEVERITY", "NO_OF_VEHICLES",
-     "NO_PERSONS", "NO_PERSONS_KILLED"]].to_string(index=False))
-# These rows are flagged, not removed so removing them would delete the events we wanted to see
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 3.6))
-sns.boxplot(x=clean_df["NO_PERSONS"], ax=axes[0])
-axes[0].set_title("NO_PERSONS - all crashes")
-sns.boxplot(x=clean_df[clean_df["IS_LARGE_CRASH"] == 0]["NO_PERSONS"], ax=axes[1])
-axes[1].set_title("NO_PERSONS - excluding the flagged crashes")
+fig, ax = plt.subplots(figsize=(6, 3.6))
+sns.boxplot(x=clean_df["NO_PERSONS"], ax=ax)
+ax.set_title("NO_PERSONS - all crashes")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig5_outlier_boxplots.png'), bbox_inches='tight')
 
@@ -389,7 +372,7 @@ print("=" * 95)
 # Remove redundant derived fields and write the cleaned and rejected datasets.
 
 # Drop derivable columns AND redundant columns identified in Task 1 and FK NODE_ID
-derivable = ['DAY_WEEK_DESC', 'DAY_OF_WEEK', 'NO_PERSONS', 'NO_PERSONS_ZSCORE', 'ACCIDENT_TYPE', 'NODE_ID']
+derivable = ['DAY_WEEK_DESC', 'DAY_OF_WEEK', 'NO_PERSONS', 'ACCIDENT_TYPE', 'NODE_ID']
 clean_df = clean_df.drop(columns=derivable)
 reject_df = reject_df.drop(columns=derivable)
 

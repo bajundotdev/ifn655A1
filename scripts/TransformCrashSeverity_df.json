@@ -1,0 +1,113 @@
+{
+    "name": "TransformCrashSeverity_df",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "AccidentDetailsOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "AccidentDetailsSource"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "AccidentOutcomeOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "AccidentOutcomeSource"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "SevereCrashesSnapshot",
+                        "type": "DatasetReference"
+                    },
+                    "name": "SinkSevereCrashesBySpeedZone"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "FilterSevere"
+                },
+                {
+                    "name": "JoinTables"
+                },
+                {
+                    "name": "ExtractYear"
+                },
+                {
+                    "name": "AggregateCrashes"
+                }
+            ],
+            "scriptLines": [
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          ACCIDENT_DATE as date,",
+                "          ACCIDENT_TIME as timestamp,",
+                "          ACCIDENT_TYPE_DESC as string,",
+                "          DCA_CODE as integer,",
+                "          DCA_DESC as string,",
+                "          LIGHT_CONDITION as integer,",
+                "          LIGHT_CONDITION_DESC as string,",
+                "          POLICE_ATTEND as integer,",
+                "          POLICE_ATTEND_DESC as string,",
+                "          ROAD_GEOMETRY as integer,",
+                "          ROAD_GEOMETRY_DESC as string,",
+                "          SEVERITY as integer,",
+                "          SEVERITY_DESC as string,",
+                "          SPEED_ZONE as integer,",
+                "          SPEED_ZONE_DESC as string,",
+                "          RMA as string",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> AccidentDetailsSource",
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          NO_OF_VEHICLES as integer,",
+                "          NO_PERSONS_KILLED as integer,",
+                "          NO_PERSONS_SERIOUS_INJ as integer,",
+                "          NO_PERSONS_OTHER_INJ as integer,",
+                "          NO_PERSONS_NOT_INJ as integer",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> AccidentOutcomeSource",
+                "AccidentDetailsSource filter(SEVERITY==1 || SEVERITY==2) ~> FilterSevere",
+                "FilterSevere, AccidentOutcomeSource join(AccidentDetailsSource@ACCIDENT_NO == AccidentOutcomeSource@ACCIDENT_NO,",
+                "     joinType:'inner',",
+                "     matchType:'exact',",
+                "     ignoreSpaces: false,",
+                "     broadcast: 'auto')~> JoinTables",
+                "JoinTables derive(ACCIDENT_YEAR = year(ACCIDENT_DATE)) ~> ExtractYear",
+                "ExtractYear aggregate(groupBy(ACCIDENT_YEAR,",
+                "          SPEED_ZONE_DESC),",
+                "     FATAL_CRASHES = sum(iif(SEVERITY==1,1,0)),",
+                "          SERIOUS_INJURY_CRASHES = sum(iif(SEVERITY==2,1,0)),",
+                "          TOTAL_SEVERE_CRASHES = count()) ~> AggregateCrashes",
+                "AggregateCrashes sink(allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     deletable:false,",
+                "     insertable:true,",
+                "     updateable:false,",
+                "     upsertable:false,",
+                "     format: 'table',",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true,",
+                "     errorHandlingOption: 'stopOnFirstError',",
+                "     mapColumn(",
+                "          ACCIDENT_YEAR,",
+                "          SPEED_ZONE_DESC,",
+                "          FATAL_CRASHES,",
+                "          SERIOUS_INJURY_CRASHES,",
+                "          TOTAL_SEVERE_CRASHES",
+                "     )) ~> SinkSevereCrashesBySpeedZone"
+            ]
+        }
+    }
+}
