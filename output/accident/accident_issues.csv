@@ -4,6 +4,17 @@ ACCIDENT_DATE / ACCIDENT_TIME,Temporal data loaded as strings instead of datetim
 SPEED_ZONE,"14,901 rows use codes 777/888/999 in a numeric column"
 NODE_ID,Contains zero or negative values
 RMA,"7,673 missing values"
+ACCIDENT_TYPE,215 values coded as 9 or unknown
+LIGHT_CONDITION,"5,472 values coded as 9 or unknown"
+NODE_ID,1 values coded as 9 or unknown
+NO_OF_VEHICLES,17 values coded as 9 or unknown
+NO_PERSONS_INJ_2,1 values coded as 9 or unknown
+NO_PERSONS_INJ_3,8 values coded as 9 or unknown
+NO_PERSONS_NOT_INJ,75 values coded as 9 or unknown
+NO_PERSONS,301 values coded as 9 or unknown
+POLICE_ATTEND,728 values coded as 9 or unknown
+ROAD_GEOMETRY,275 values coded as 9 or unknown
+ROAD_GEOMETRY_DESC,275 values coded as 9 or unknown
 SEVERITY,"Severe target class imbalance: Fatal crashes (1) represent only 1.67% of data, class 4 (none) is entirely missing"
 NO_PERSONS,Extreme right-skew distribution containing severe mass-casualty outliers (up to ~100 persons) that will warp distance-based algorithms
 DAY_OF_WEEK,"4,584 rows fail to match ISO numbering."

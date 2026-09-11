@@ -60,10 +60,16 @@ accident_df["SPEED_ZONE_DESC"] = accident_df["SPEED_ZONE_DESC"].replace('nan', '
 print("\nBinned SPEED_ZONE_DESC distribution:")
 print(accident_df["SPEED_ZONE_DESC"].value_counts().to_string())
 
-# Report the single-digit 9 codes but leave them intact for the mapping phase
+# Report the single-digit 9 codes then fill it with mode
 for column in ["LIGHT_CONDITION", "POLICE_ATTEND", "ROAD_GEOMETRY"]:
     count = (accident_df[column] == 9).sum()
-    print(f'{column:<18} code 9 (Unknown) found in {count:,} rows. Retaining as category 9.')
+    print(f'{column:<18} code 9 (Unknown) found in {count:,} rows ({(count / accident_df[column].count()) * 100:.2}%).')
+
+for column in ["LIGHT_CONDITION", "POLICE_ATTEND", "ROAD_GEOMETRY"]:
+    accident_df[column] = accident_df[column].replace(9, pd.NA)
+    mode = accident_df[column].mode(dropna=True)
+    if not mode.empty:
+        accident_df[column] = accident_df[column].fillna(mode.iloc[0])
 
 print("\nAfter conversion, isnull().sum() now reports:")
 print(accident_df[["SPEED_ZONE", "LIGHT_CONDITION", "POLICE_ATTEND", "ROAD_GEOMETRY", "RMA"]].isnull().sum())
@@ -72,6 +78,7 @@ print(accident_df[["SPEED_ZONE", "LIGHT_CONDITION", "POLICE_ATTEND", "ROAD_GEOME
 missing_before = accident_df['RMA'].isnull().sum()
 print(f'\nRMA missing values before: {missing_before:,} ({missing_before / len(accident_df) * 100:.2f}%)')
 
+
 accident_year = pd.to_datetime(accident_df['ACCIDENT_DATE']).dt.year
 
 # Is the missingness spread evenly, or concentrated in particular years?
@@ -79,7 +86,11 @@ by_year = accident_df.groupby(accident_year)['RMA'].apply(lambda s: s.isnull().m
 print('\nPercent of RMA missing by accident year:')
 print(by_year.round(2).to_string())
 
-accident_df["RMA"] = accident_df["RMA"].fillna("Unknown")
+rma_mode = accident_df["RMA"].mode(dropna=True)
+if not rma_mode.empty:
+    accident_df["RMA"] = accident_df["RMA"].fillna(rma_mode.iloc[0])
+else:
+    accident_df["RMA"] = accident_df["RMA"].fillna("Unknown")
 print(f'\nRMA missing values after: {accident_df["RMA"].isnull().sum()}')
 
 # The dictionary defines NODE_ID as a location identifier that increments with new locations. 
@@ -211,7 +222,6 @@ accident_df['ROAD_GEOMETRY_DESC'] = accident_df['ROAD_GEOMETRY'].map(road_geomet
 
 print("\nAdded description columns for SEVERITY, POLICE_ATTEND, LIGHT_CONDITION, and ROAD_GEOMETRY.")
 
-
 # STEP 07: This step applies data-quality validation rules to identify records that are internally inconsistent 
 # or unlinked to vehicle data, moves those invalid records into a rejected dataset, and retains a clear reason 
 # for each rejection.
@@ -257,8 +267,6 @@ clean_df = accident_df[~(no_vehicles | contradiction | orphan_crash)].copy()
 print(f"\nrows before filtering: {len(accident_df):,}")
 print(f"rows set aside: {len(reject_df):,}")
 print(f"rows kept: {len(clean_df):,}")
-print("\nReasons recorded on the rejected rows:")
-print(reject_df["REJECT_REASON"].value_counts().to_string())
 
 # STEP 08: This step identifies extreme outliers in the person and vehicle count fields using a z-score threshold,
 # flags them for review, and plots the impact so we can assess whether they represent legitimate events or 

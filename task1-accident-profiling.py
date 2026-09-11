@@ -125,9 +125,26 @@ for column in has_nulls.index:
         "Issue": f"{count:,} missing values"
     })
 
+# Identify columns containing the sentinel value 9 or the category "unknown".
+print("\nColumns containing values coded as 9 or 'unknown':")
+for column in accident_df.columns:
+    values = accident_df[column].astype("string").str.strip().str.lower()
+    sentinel_count = int(values.isin(["9", "unknown"]).sum())
+
+    if sentinel_count > 0:
+        codes_found = values[values.isin(["9", "unknown"])].value_counts().to_dict()
+        print(
+            f"{column:<24} {format(sentinel_count, ','):>10} "
+            f"{sentinel_count / len(accident_df) * 100:6.2f}% "
+            f"{list(codes_found)[0]:>8}"
+        )
+        issues.append({
+            "Column": column,
+            "Issue": f"{sentinel_count:,} values coded as 9 or unknown"
+        })
+
 # The RMA column has a high number of missing records, 7673, so we keep this visible
 # in the audit output for later review in the data-cleaning stage.
-
 if len(has_nulls) == 0:
     print("none")
  
