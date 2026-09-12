@@ -1,0 +1,160 @@
+{
+    "name": "TransformVehOccSafety_df",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "AccidentDetailsOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sourceAccidents"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "VehicleCleanOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sourceCharacteristics"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "VehicleCrashInvolvementSQL",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sourceInvolvement"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "VehOccupSafetySnapshot",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sinkVehOccSafety"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "joinVehicles"
+                },
+                {
+                    "name": "joinAll"
+                },
+                {
+                    "name": "ExtractYear"
+                },
+                {
+                    "name": "aggregateOccupancy"
+                }
+            ],
+            "scriptLines": [
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          ACCIDENT_DATE as date,",
+                "          ACCIDENT_TIME as timestamp,",
+                "          ACCIDENT_TYPE_DESC as string,",
+                "          DCA_CODE as integer,",
+                "          DCA_DESC as string,",
+                "          LIGHT_CONDITION as integer,",
+                "          LIGHT_CONDITION_DESC as string,",
+                "          POLICE_ATTEND as integer,",
+                "          POLICE_ATTEND_DESC as string,",
+                "          ROAD_GEOMETRY as integer,",
+                "          ROAD_GEOMETRY_DESC as string,",
+                "          SEVERITY as integer,",
+                "          SEVERITY_DESC as string,",
+                "          SPEED_ZONE as integer,",
+                "          SPEED_ZONE_DESC as string,",
+                "          RMA as string",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: true,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> sourceAccidents",
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          VEHICLE_ID as string,",
+                "          VEHICLE_YEAR_MANUF as short,",
+                "          VEHICLE_BODY_STYLE as string,",
+                "          VEHICLE_MAKE as string,",
+                "          VEHICLE_MODEL as string,",
+                "          VEHICLE_TYPE as integer,",
+                "          VEHICLE_TYPE_DESC as string,",
+                "          FUEL_TYPE as string,",
+                "          NO_OF_WHEELS as integer,",
+                "          NO_OF_CYLINDERS as integer,",
+                "          SEATING_CAPACITY as integer,",
+                "          VEHICLE_COLOUR_1 as string,",
+                "          TARE_WEIGHT as integer",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: true,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> sourceCharacteristics",
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          VEHICLE_ID as string,",
+                "          VEHICLE_DCA_CODE as string,",
+                "          INITIAL_DIRECTION as string,",
+                "          FINAL_DIRECTION as string,",
+                "          INITIAL_IMPACT as string,",
+                "          DRIVER_INTENT as string,",
+                "          VEHICLE_MOVEMENT as string,",
+                "          ROAD_SURFACE_TYPE as integer,",
+                "          ROAD_SURFACE_TYPE_DESC as string,",
+                "          TRAFFIC_CONTROL_DESC as string,",
+                "          LEVEL_OF_DAMAGE as integer,",
+                "          CAUGHT_FIRE as integer,",
+                "          LAMPS as integer,",
+                "          TOWED_AWAY_FLAG as integer,",
+                "          TOTAL_NO_OCCUPANTS as integer,",
+                "          VEHICLE_MAKE as string,",
+                "          VEHICLE_MODEL as string",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: true,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> sourceInvolvement",
+                "sourceCharacteristics, sourceInvolvement join(sourceCharacteristics@ACCIDENT_NO == sourceInvolvement@ACCIDENT_NO",
+                "     && sourceCharacteristics@VEHICLE_ID == sourceInvolvement@VEHICLE_ID,",
+                "     joinType:'inner',",
+                "     matchType:'exact',",
+                "     ignoreSpaces: false,",
+                "     broadcast: 'auto')~> joinVehicles",
+                "joinVehicles, sourceAccidents join(sourceCharacteristics@ACCIDENT_NO == sourceAccidents@ACCIDENT_NO,",
+                "     joinType:'inner',",
+                "     matchType:'exact',",
+                "     ignoreSpaces: false,",
+                "     broadcast: 'auto')~> joinAll",
+                "joinAll derive(ACCIDENT_YEAR = year(ACCIDENT_DATE)) ~> ExtractYear",
+                "ExtractYear aggregate(groupBy(ACCIDENT_YEAR,",
+                "          VEHICLE_TYPE_DESC),",
+                "     WITHIN_CAPACITY_COUNT = toInteger(sum(iif(!isNull(TOTAL_NO_OCCUPANTS) && !isNull(SEATING_CAPACITY) && SEATING_CAPACITY > 0 && TOTAL_NO_OCCUPANTS < SEATING_CAPACITY, 1, 0))),",
+                "          FULL_CAPACITY_COUNT = toInteger(sum(iif(!isNull(TOTAL_NO_OCCUPANTS) && !isNull(SEATING_CAPACITY) && SEATING_CAPACITY > 0 && TOTAL_NO_OCCUPANTS == SEATING_CAPACITY, 1, 0))),",
+                "          OVER_CAPACITY_COUNT = toInteger(sum(iif(!isNull(TOTAL_NO_OCCUPANTS) && !isNull(SEATING_CAPACITY) && SEATING_CAPACITY > 0 && TOTAL_NO_OCCUPANTS > SEATING_CAPACITY, 1, 0))),",
+                "          UNASSESSABLE_COUNT = toInteger(sum(iif(isNull(TOTAL_NO_OCCUPANTS) || isNull(SEATING_CAPACITY) || SEATING_CAPACITY <= 0, 1, 0)))) ~> aggregateOccupancy",
+                "aggregateOccupancy sink(allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     deletable:false,",
+                "     insertable:true,",
+                "     updateable:false,",
+                "     upsertable:false,",
+                "     truncate:true,",
+                "     format: 'table',",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true,",
+                "     errorHandlingOption: 'stopOnFirstError',",
+                "     mapColumn(",
+                "          ACCIDENT_YEAR,",
+                "          VEHICLE_TYPE_DESC,",
+                "          WITHIN_CAPACITY_COUNT,",
+                "          FULL_CAPACITY_COUNT,",
+                "          OVER_CAPACITY_COUNT,",
+                "          UNASSESSABLE_COUNT",
+                "     )) ~> sinkVehOccSafety"
+            ]
+        }
+    }
+}

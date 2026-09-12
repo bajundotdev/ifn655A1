@@ -1,9 +1,9 @@
 {
-    "name": "transform_crash_severity_pipeline",
+    "name": "transform_vehicle_occupancy_safety_pipeline",
     "properties": {
         "activities": [
             {
-                "name": "TransformAccidentSeverity",
+                "name": "TransformVehOccupancySafety",
                 "type": "ExecuteDataFlow",
                 "dependsOn": [],
                 "policy": {
@@ -16,7 +16,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "dataflow": {
-                        "referenceName": "TransformCrashSeverity_df",
+                        "referenceName": "TransformVehOccSafety_df",
                         "type": "DataFlowReference"
                     },
                     "compute": {
@@ -27,6 +27,8 @@
                 }
             }
         ],
-        "annotations": []
-    }
+        "annotations": [],
+        "lastPublishTime": "2026-09-12T08:22:26Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
 }

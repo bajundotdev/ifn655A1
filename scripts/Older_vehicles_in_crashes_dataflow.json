@@ -1,0 +1,123 @@
+{
+    "name": "Older_vehicles_in_crashes_dataflow",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "AccidentCleanOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sourceAccidentDetails"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "VehicleCleanOutputSql",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sourceVehicleChar"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "OldVehicleSevereCrashesSnapshot",
+                        "type": "DatasetReference"
+                    },
+                    "name": "sinkOlderVehiclesInSevereCrashes"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "join1"
+                },
+                {
+                    "name": "SevrityCheckAndCarAge"
+                },
+                {
+                    "name": "aggregate1"
+                },
+                {
+                    "name": "derivedAge"
+                },
+                {
+                    "name": "CleanAccidentNo1"
+                },
+                {
+                    "name": "CleanVehicleNo2"
+                }
+            ],
+            "scriptLines": [
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          ACCIDENT_DATE as date,",
+                "          ACCIDENT_TIME as timestamp,",
+                "          ACCIDENT_TYPE_DESC as string,",
+                "          DCA_CODE as integer,",
+                "          DCA_DESC as string,",
+                "          LIGHT_CONDITION as integer,",
+                "          LIGHT_CONDITION_DESC as string,",
+                "          POLICE_ATTEND as integer,",
+                "          POLICE_ATTEND_DESC as string,",
+                "          ROAD_GEOMETRY as integer,",
+                "          ROAD_GEOMETRY_DESC as string,",
+                "          SEVERITY as integer,",
+                "          SEVERITY_DESC as string,",
+                "          SPEED_ZONE as integer,",
+                "          SPEED_ZONE_DESC as string,",
+                "          RMA as string",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: true,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> sourceAccidentDetails",
+                "source(output(",
+                "          ACCIDENT_NO as string,",
+                "          VEHICLE_ID as string,",
+                "          VEHICLE_YEAR_MANUF as short,",
+                "          VEHICLE_BODY_STYLE as string,",
+                "          VEHICLE_MAKE as string,",
+                "          VEHICLE_MODEL as string,",
+                "          VEHICLE_TYPE as integer,",
+                "          VEHICLE_TYPE_DESC as string,",
+                "          FUEL_TYPE as string,",
+                "          NO_OF_WHEELS as integer,",
+                "          NO_OF_CYLINDERS as integer,",
+                "          SEATING_CAPACITY as integer,",
+                "          VEHICLE_COLOUR_1 as string,",
+                "          TARE_WEIGHT as integer",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> sourceVehicleChar",
+                "CleanAccidentNo1, CleanVehicleNo2 join(CleanAccidentNo1@CLEAN_ACCIDENT_NO == CleanVehicleNo2@CLEAN_ACCIDENT_NO,",
+                "     joinType:'inner',",
+                "     matchType:'exact',",
+                "     ignoreSpaces: false,",
+                "     broadcast: 'auto')~> join1",
+                "derivedAge filter((toInteger(SEVERITY) == 1 || toInteger(SEVERITY) == 2) && !isNull(VEHICLE_YEAR_MANUF) && VEHICLE_AGE >= 15 && toInteger(VEHICLE_YEAR_MANUF) >= 1900 && toInteger(VEHICLE_YEAR_MANUF) <= ACCIDENT_YEAR) ~> SevrityCheckAndCarAge",
+                "SevrityCheckAndCarAge aggregate(groupBy(ACCIDENT_YEAR,",
+                "          VEHICLE_TYPE,",
+                "          VEHICLE_TYPE_DESC),",
+                "     OLDER_VEHICLE_COUNT = count(VEHICLE_ID)) ~> aggregate1",
+                "join1 derive(ACCIDENT_YEAR = year(ACCIDENT_DATE),",
+                "          VEHICLE_AGE = year(ACCIDENT_DATE) - toInteger(VEHICLE_YEAR_MANUF)) ~> derivedAge",
+                "sourceAccidentDetails derive(CLEAN_ACCIDENT_NO = upper(trim(ACCIDENT_NO))) ~> CleanAccidentNo1",
+                "sourceVehicleChar derive(CLEAN_ACCIDENT_NO = upper(trim(ACCIDENT_NO))) ~> CleanVehicleNo2",
+                "aggregate1 sink(allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     deletable:false,",
+                "     insertable:true,",
+                "     updateable:false,",
+                "     upsertable:false,",
+                "     truncate:true,",
+                "     format: 'table',",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true,",
+                "     errorHandlingOption: 'stopOnFirstError') ~> sinkOlderVehiclesInSevereCrashes"
+            ]
+        }
+    }
+}

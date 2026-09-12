@@ -1,9 +1,9 @@
 {
-    "name": "accident_to_db_pipeline",
+    "name": "vehicleclean_to_db_pipeline",
     "properties": {
         "activities": [
             {
-                "name": "CopyAccidentBlobtoSQL",
+                "name": "CopyVehicleBlobtoSQL",
                 "type": "Copy",
                 "dependsOn": [],
                 "policy": {
@@ -32,7 +32,8 @@
                         "upsertSettings": {
                             "useTempDB": true,
                             "keys": [
-                                "ACCIDENT_NO"
+                                "ACCIDENT_NO",
+                                "VEHICLE_ID"
                             ]
                         },
                         "sqlWriterUseTableLock": false,
@@ -56,194 +57,158 @@
                             },
                             {
                                 "source": {
-                                    "name": "ACCIDENT_DATE",
+                                    "name": "VEHICLE_ID",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "ACCIDENT_DATE",
-                                    "type": "Date",
-                                    "physicalType": "date"
+                                    "name": "VEHICLE_ID",
+                                    "type": "String",
+                                    "physicalType": "char"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "ACCIDENT_TIME",
+                                    "name": "VEHICLE_YEAR_MANUF",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "ACCIDENT_TIME",
-                                    "type": "TimeSpan",
-                                    "physicalType": "time"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "ACCIDENT_TYPE_DESC",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "ACCIDENT_TYPE_DESC",
-                                    "type": "String",
-                                    "physicalType": "varchar"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "DCA_CODE",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "DCA_CODE",
+                                    "name": "VEHICLE_YEAR_MANUF",
                                     "type": "Int16",
                                     "physicalType": "smallint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "DCA_DESC",
+                                    "name": "VEHICLE_BODY_STYLE",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "DCA_DESC",
+                                    "name": "VEHICLE_BODY_STYLE",
                                     "type": "String",
                                     "physicalType": "varchar"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "LIGHT_CONDITION",
+                                    "name": "VEHICLE_MAKE",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "LIGHT_CONDITION",
+                                    "name": "VEHICLE_MAKE",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_MODEL",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_MODEL",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_TYPE",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_TYPE",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "LIGHT_CONDITION_DESC",
+                                    "name": "VEHICLE_TYPE_DESC",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "LIGHT_CONDITION_DESC",
+                                    "name": "VEHICLE_TYPE_DESC",
                                     "type": "String",
                                     "physicalType": "varchar"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "POLICE_ATTEND",
+                                    "name": "FUEL_TYPE",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "POLICE_ATTEND",
+                                    "name": "FUEL_TYPE",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "NO_OF_WHEELS",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "NO_OF_WHEELS",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "POLICE_ATTEND_DESC",
+                                    "name": "NO_OF_CYLINDERS",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "POLICE_ATTEND_DESC",
-                                    "type": "String",
-                                    "physicalType": "varchar"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "ROAD_GEOMETRY",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "ROAD_GEOMETRY",
+                                    "name": "NO_OF_CYLINDERS",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "ROAD_GEOMETRY_DESC",
+                                    "name": "SEATING_CAPACITY",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "ROAD_GEOMETRY_DESC",
-                                    "type": "String",
-                                    "physicalType": "varchar"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "SEVERITY",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "SEVERITY",
+                                    "name": "SEATING_CAPACITY",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "SEVERITY_DESC",
+                                    "name": "VEHICLE_COLOUR_1",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "SEVERITY_DESC",
+                                    "name": "VEHICLE_COLOUR_1",
                                     "type": "String",
                                     "physicalType": "varchar"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "SPEED_ZONE",
+                                    "name": "TARE_WEIGHT",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "SPEED_ZONE",
-                                    "type": "Int16",
-                                    "physicalType": "smallint"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "SPEED_ZONE_DESC",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "SPEED_ZONE_DESC",
-                                    "type": "String",
-                                    "physicalType": "varchar"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "name": "RMA",
-                                    "type": "String",
-                                    "physicalType": "String"
-                                },
-                                "sink": {
-                                    "name": "RMA",
-                                    "type": "String",
-                                    "physicalType": "varchar"
+                                    "name": "TARE_WEIGHT",
+                                    "type": "Int32",
+                                    "physicalType": "int"
                                 }
                             }
                         ],
@@ -256,23 +221,23 @@
                 },
                 "inputs": [
                     {
-                        "referenceName": "SourceBlobAccidentCleanedCSV",
+                        "referenceName": "CopytoSourceBlobVehicleCleanedCSV",
                         "type": "DatasetReference"
                     }
                 ],
                 "outputs": [
                     {
-                        "referenceName": "AccidentDetailsOutputSql",
+                        "referenceName": "VehicleCleanOutputSql",
                         "type": "DatasetReference"
                     }
                 ]
             },
             {
-                "name": "CopyAccidentOutcomeBlobtoSQL",
+                "name": "CopyVehicleCrashInvolvemenetBlobtoSQL",
                 "type": "Copy",
                 "dependsOn": [
                     {
-                        "activity": "CopyAccidentBlobtoSQL",
+                        "activity": "CopyVehicleBlobtoSQL",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -304,7 +269,8 @@
                         "upsertSettings": {
                             "useTempDB": true,
                             "keys": [
-                                "ACCIDENT_NO"
+                                "ACCIDENT_NO",
+                                "VEHICLE_ID"
                             ]
                         },
                         "sqlWriterUseTableLock": false,
@@ -328,62 +294,206 @@
                             },
                             {
                                 "source": {
-                                    "name": "NO_OF_VEHICLES",
+                                    "name": "VEHICLE_ID",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "NO_OF_VEHICLES",
+                                    "name": "VEHICLE_ID",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_DCA_CODE",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_DCA_CODE",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "INITIAL_DIRECTION",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "INITIAL_DIRECTION",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "FINAL_DIRECTION",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "FINAL_DIRECTION",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "INITIAL_IMPACT",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "INITIAL_IMPACT",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "DRIVER_INTENT",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "DRIVER_INTENT",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_MOVEMENT",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_MOVEMENT",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "ROAD_SURFACE_TYPE",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "ROAD_SURFACE_TYPE",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "NO_PERSONS_KILLED",
+                                    "name": "ROAD_SURFACE_TYPE_DESC",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "NO_PERSONS_KILLED",
+                                    "name": "ROAD_SURFACE_TYPE_DESC",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "TRAFFIC_CONTROL_DESC",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "TRAFFIC_CONTROL_DESC",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "LEVEL_OF_DAMAGE",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "LEVEL_OF_DAMAGE",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "NO_PERSONS_SERIOUS_INJ",
+                                    "name": "CAUGHT_FIRE",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "NO_PERSONS_SERIOUS_INJ",
+                                    "name": "CAUGHT_FIRE",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "NO_PERSONS_OTHER_INJ",
+                                    "name": "LAMPS",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "NO_PERSONS_OTHER_INJ",
+                                    "name": "LAMPS",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
                                 }
                             },
                             {
                                 "source": {
-                                    "name": "NO_PERSONS_NOT_INJ",
+                                    "name": "TOWED_AWAY_FLAG",
                                     "type": "String",
                                     "physicalType": "String"
                                 },
                                 "sink": {
-                                    "name": "NO_PERSONS_NOT_INJ",
+                                    "name": "TOWED_AWAY_FLAG",
                                     "type": "Byte",
                                     "physicalType": "tinyint"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "TOTAL_NO_OCCUPANTS",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "TOTAL_NO_OCCUPANTS",
+                                    "type": "Int16",
+                                    "physicalType": "smallint"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_MAKE",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_MAKE",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "VEHICLE_MODEL",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "VEHICLE_MODEL",
+                                    "type": "String",
+                                    "physicalType": "varchar"
                                 }
                             }
                         ],
@@ -396,23 +506,23 @@
                 },
                 "inputs": [
                     {
-                        "referenceName": "SourceBlobAccidentCleanedCSV",
+                        "referenceName": "CopytoSourceBlobVehicleCleanedCSV",
                         "type": "DatasetReference"
                     }
                 ],
                 "outputs": [
                     {
-                        "referenceName": "AccidentOutcomeOutputSql",
+                        "referenceName": "VehicleCrashInvolvementSQL",
                         "type": "DatasetReference"
                     }
                 ]
             },
             {
-                "name": "TransformCrashSeverity",
+                "name": "TransformOldVehSevereCrashes",
                 "type": "ExecuteDataFlow",
                 "dependsOn": [
                     {
-                        "activity": "CopyAccidentOutcomeBlobtoSQL",
+                        "activity": "CopyVehicleCrashInvolvemenetBlobtoSQL",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -428,7 +538,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "dataflow": {
-                        "referenceName": "TransformCrashSeverity_df",
+                        "referenceName": "Older_vehicles_in_crashes_dataflow",
                         "type": "DataFlowReference"
                     },
                     "compute": {
@@ -440,7 +550,7 @@
             }
         ],
         "annotations": [],
-        "lastPublishTime": "2026-09-12T07:35:20Z"
+        "lastPublishTime": "2026-09-12T09:09:59Z"
     },
     "type": "Microsoft.DataFactory/factories/pipelines"
 }

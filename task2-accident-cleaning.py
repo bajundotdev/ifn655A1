@@ -44,8 +44,8 @@ print(f'Mean SPEED_ZONE excluding codes: {mean_after:.1f}')
 # The first figure is not a speed limit - it is what happens when 999 is averaged in
 
 # Apply binning into a new SPEED_ZONE_DESC column
-bins = [0, 40, 50, 60, 75, 80, 90, 100, 110]
-labels = ['40 km/hr', '50 km/hr', '60 km/hr', '75 km/hr', '80 km/hr', '90 km/hr', '100 km/hr', '110 km/hr']
+bins = [0, 30, 40, 50, 60, 70, 75, 80, 90, 100, 110]
+labels = ['30 km/hr', '40 km/hr', '50 km/hr', '60 km/hr', '70 km/hr', '75 km/hr', '80 km/hr', '90 km/hr', '100 km/hr', '110 km/hr']
 
 accident_df["SPEED_ZONE_DESC"] = pd.cut(
     pd.to_numeric(accident_df["SPEED_ZONE"]), 
