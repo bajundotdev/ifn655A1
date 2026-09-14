@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,9 +7,9 @@ from scipy import stats
 
 FOLDER_PATH = 'data'
 ACCIDENT_FILENAME = 'accident-original.csv'
-OUTPUT_FOLDER = 'output/accident'
+output_dir = Path("output/accident")
+output_dir.mkdir(parents=True, exist_ok=True)
 
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # STEP 01: This step loads the raw accident data into memory, preserves an untouched copy for later reconciliation,
 # and prints a basic profile of the dataset so we can confirm that the file has been read correctly before cleaning.
@@ -19,7 +19,6 @@ print("=" * 95)
 raw = pd.read_csv(f"{FOLDER_PATH}/{ACCIDENT_FILENAME}", encoding='unicode_escape', low_memory=False)
 accident_df = raw.copy()   # raw is kept untouched so the totals can be reconciled at the end
 print(accident_df.info())
-
 print(f'{ACCIDENT_FILENAME} loaded: {len(accident_df):,} rows, {accident_df.shape[1]} columns')
 
 # STEP 02: This step checks for hidden sentinel codes (such as 777, 888, 999), investigates where missing values 
@@ -284,7 +283,7 @@ fig, ax = plt.subplots(figsize=(6, 3.6))
 sns.boxplot(x=clean_df["NO_PERSONS"], ax=ax)
 ax.set_title("NO_PERSONS - all crashes")
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig5_outlier_boxplots.png'), bbox_inches='tight')
+plt.savefig(output_dir / 'fig5_outlier_boxplots.png', bbox_inches='tight')
 
 # STEP 09: This step checks text-based fields for accidental leading/trailing spaces and inconsistent letter case,
 # so values can be compared and grouped reliably before reporting or downstream modelling.
@@ -379,5 +378,6 @@ reject_df = reject_df.drop(columns=derivable)
 print(f'\ncleaned columns : {clean_df.shape[1]}')
 print(f'rejected columns: {reject_df.shape[1]}')
 
-clean_df.to_csv(os.path.join(OUTPUT_FOLDER, 'accident_cleaned.csv'), index=False)
-reject_df.to_csv(os.path.join(OUTPUT_FOLDER, 'accident_rejected.csv'), index=False)
+clean_df.to_csv(output_dir / 'accident_cleaned.csv', index=False)
+reject_df.to_csv(output_dir / 'accident_rejected.csv', index=False)
+print(f"\nFiles exported successfully to '{output_dir}/'.")

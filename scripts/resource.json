@@ -1,0 +1,71 @@
+{
+    "sku": {
+        "name": "Standard_RAGRS",
+        "tier": "Standard"
+    },
+    "kind": "StorageV2",
+    "id": "/subscriptions/0bf9032e-9704-4a08-9b48-1f4e934f7383/resourceGroups/IFN655-2026-2A1/providers/Microsoft.Storage/storageAccounts/ifn65520262a1storage",
+    "name": "ifn65520262a1storage",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "eastasia",
+    "tags": {},
+    "properties": {
+        "dnsEndpointType": "Standard",
+        "defaultToOAuthAuthentication": false,
+        "publicNetworkAccess": "Enabled",
+        "keyCreationTime": {
+            "key1": "2026-09-10T08:01:50.1176394Z",
+            "key2": "2026-09-10T08:01:50.1176394Z"
+        },
+        "allowCrossTenantReplication": false,
+        "privateEndpointConnections": [],
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": true,
+        "networkAcls": {
+            "bypass": "AzureServices",
+            "virtualNetworkRules": [],
+            "ipRules": [],
+            "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+            "requireInfrastructureEncryption": false,
+            "services": {
+                "file": {
+                    "keyType": "Account",
+                    "enabled": true,
+                    "lastEnabledTime": "2026-09-10T08:01:50.1278925Z"
+                },
+                "blob": {
+                    "keyType": "Account",
+                    "enabled": true,
+                    "lastEnabledTime": "2026-09-10T08:01:50.1278925Z"
+                }
+            },
+            "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot",
+        "provisioningState": "Succeeded",
+        "creationTime": "2026-09-10T08:01:49.9942272Z",
+        "primaryEndpoints": {
+            "dfs": "https://ifn65520262a1storage.dfs.core.windows.net/",
+            "web": "https://ifn65520262a1storage.z7.web.core.windows.net/",
+            "blob": "https://ifn65520262a1storage.blob.core.windows.net/",
+            "queue": "https://ifn65520262a1storage.queue.core.windows.net/",
+            "table": "https://ifn65520262a1storage.table.core.windows.net/",
+            "file": "https://ifn65520262a1storage.file.core.windows.net/"
+        },
+        "primaryLocation": "eastasia",
+        "statusOfPrimary": "available",
+        "secondaryLocation": "southeastasia",
+        "statusOfSecondary": "available",
+        "secondaryEndpoints": {
+            "dfs": "https://ifn65520262a1storage-secondary.dfs.core.windows.net/",
+            "web": "https://ifn65520262a1storage-secondary.z7.web.core.windows.net/",
+            "blob": "https://ifn65520262a1storage-secondary.blob.core.windows.net/",
+            "queue": "https://ifn65520262a1storage-secondary.queue.core.windows.net/",
+            "table": "https://ifn65520262a1storage-secondary.table.core.windows.net/"
+        }
+    }
+}

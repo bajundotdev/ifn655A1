@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,12 +7,10 @@ from scipy import stats
 
 FOLDER_PATH = 'data'
 ACCIDENT_FILENAME = 'accident-original.csv'
-OUTPUT_FOLDER = 'output/accident'
+output_dir = Path("output/accident")
+output_dir.mkdir(parents=True, exist_ok=True)
 
 issues = []
-
-# Create the output folder before saving charts and issue reports.
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # STEP 01: This step processes the raw accident dataset by reading the CSV into memory and checking
 # the row count, column count, and overall dataset footprint before any profiling work begins.
@@ -92,7 +90,7 @@ plt.xlabel("SPEED_ZONE as loaded")
 plt.ylabel("crashes")
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig1_speed_zone_chart.png'), bbox_inches='tight')
+plt.savefig(output_dir / 'fig1_speed_zone_chart.png', bbox_inches='tight')
 plt.close()
 
 # Check NODE_ID for impossible location identifiers, which often indicate bad or missing node references.
@@ -225,7 +223,7 @@ plt.title("Number of crashes by severity code")
 plt.xlabel("SEVERITY (1 = fatal, 2 = serious injury, 3 = other injury, 4 = none)")
 plt.ylabel("crashes")
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig2_severity_chart.png'), bbox_inches='tight')
+plt.savefig(output_dir / 'fig2_severity_chart.png', bbox_inches='tight')
 plt.close()
  
 # The boxplot helps visualise the spread and central tendency of persons involved per crash,
@@ -235,7 +233,7 @@ sns.boxplot(x=accident_df["NO_PERSONS"])
 plt.title("Persons involved per crash - box plot")
 plt.xlabel("NO_PERSONS")
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig3_persons_boxplot.png'), bbox_inches='tight')
+plt.savefig(output_dir / 'fig3_persons_boxplot.png', bbox_inches='tight')
 plt.close()
  
 # STEP 09: This step processes relationships between fields by checking whether codes and descriptions match,
@@ -340,10 +338,11 @@ plt.figure(figsize=(11, 9))
 sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", annot_kws={"size": 7})
 plt.title("Correlation between true continuous columns - accident.csv")
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_FOLDER, 'fig4_correlation_heatmap.png'), bbox_inches='tight')
+plt.savefig(output_dir / 'fig4_correlation_heatmap.png', bbox_inches='tight')
 # plt.show()
 
 # Save to OUTPUT Folder
 # Export the issues log so the data-quality findings are captured in a structured output file.
 issues_df = pd.DataFrame(issues)
-issues_df.to_csv(f'{OUTPUT_FOLDER}/accident_issues.csv', index=False)
+issues_df.to_csv(output_dir / 'accident_issues.csv', index=False)
+print(f"\nFiles exported successfully to '{output_dir}/'.")
